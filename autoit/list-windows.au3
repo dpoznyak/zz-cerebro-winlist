@@ -21,7 +21,7 @@ if $limit > 20 Then
 For $i = 1 to $limit
    Local $hwnd = $v[$i][1]
    Local $pid = WinGetProcess($hwnd)
-   Local $preJson = "{'pid': " & $pid & ", 'hwnd': '" & $hwnd & "', 'processPath': '" & _ProcessGetLocation($pid) & "', 'title':'" & WinGetTitle($hwnd) &  "', 'match': '"  & $v[$i][0] & "'}"
+   Local $preJson = "{'pid': " & $pid & ", 'i': " & $i& ", 'hwnd': '" & $hwnd & "', 'processPath': '" & _ProcessGetLocation($pid) & "', 'title':'" & WinGetTitle($hwnd) &  "', 'match': '"  & $v[$i][0] & "'}"
 	  Local $json = StringReplace( StringReplace( $preJson, "'", """"), "\", "\\")
    ConsoleWrite(   $json	   & @CRLF)
 

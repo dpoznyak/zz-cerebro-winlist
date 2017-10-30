@@ -48,8 +48,8 @@ const fn = ({term, display}) => {
       return;
     }
     findWindows(searchTerm).then(list => {
-      const results = list.map(({pid, hwnd, processPath, title, match}) => ({
-        id: pid,
+      const results = list.map(({pid,i, hwnd, processPath, title, match}) => ({
+        id: i,
         title,
         icon: processPath,
         subtitle: match,
