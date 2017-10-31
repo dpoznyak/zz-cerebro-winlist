@@ -1,9 +1,14 @@
 #AutoIt3Wrapper_Change2CUI=y
+#include <WinAPI.au3>
 ; #AutoIt3Wrapper_Au3Check_Parameters=-d -w 1 -w 2 -w 3 -w- 4 -w 5 -w 6 -w- 7
 Opt("WinTextMatchMode", 4)
-Local $term = $CmdLine[1]
+Local $searchTerm = ""
+Local $term  = ""
+if UBound($CmdLine) > 1 Then
+$term= $CmdLine[1]
+EndIf
+$searchTerm ="[REGEXPTITLE:(?i)("&$term&")]"
 
-Local $searchTerm ="[REGEXPTITLE:(?i)("&$term&")]"
 ;ConsoleWrite($searchTerm)
 local $v = WinList($searchTerm)
 
@@ -12,21 +17,28 @@ local $v = WinList($searchTerm)
 
 
 ConsoleWrite("[" & @CRLF)
-Local $limit = $v[0][0]
-if $limit > 20 Then
-	  $limit = 20
-   EndIf
+Local $eaten = 0
 
-
-For $i = 1 to $limit
+For $i = 1 to $v[0][0]
    Local $hwnd = $v[$i][1]
    Local $pid = WinGetProcess($hwnd)
-   Local $preJson = "{'pid': " & $pid & ", 'i': " & $i& ", 'hwnd': '" & $hwnd & "', 'processPath': '" & _ProcessGetLocation($pid) & "', 'title':'" & WinGetTitle($hwnd) &  "', 'match': '"  & $v[$i][0] & "'}"
-	  Local $json = StringReplace( StringReplace( $preJson, "'", """"), "\", "\\")
-   ConsoleWrite(   $json	   & @CRLF)
+   Local $title = $v[$i][0]
+   Local $path = _ProcessGetLocation($pid)
+   Local $exStyle = _WinAPI_GetWindowLong ($hwnd, $GWL_EXSTYLE)
+   if ($title == "") or ($path == "") or (BitAND($exStyle,0x00000080 ) <> 0) or BitAND(WinGetState($hwnd), 2) ==0 Then ;$WS_EX_APPWINDOW
+	  ContinueLoop
+   EndIf
 
-   if $i < $limit Then
-	  ConsoleWrite(",")
+   if $eaten > 0 Then
+	  	  ConsoleWrite(",")
+   endif
+   $eaten = $eaten + 1
+   Local $preJson = "{'pid': " & $pid & ", 'i': " & $i& ", 'hwnd': '" & $hwnd & "', 'processPath': '" & $path & "', 'title':'" & $title &  "', 'match': '"  & $title & "'}"
+	  Local $json = StringReplace( StringReplace( $preJson, "'", """"), "\", "\\")
+   ConsoleWrite( _WinAPI_WideCharToMultiByte (  $json, 65001,1)	   & @CRLF)
+
+   if $eaten > 20 then
+	  ExitLoop
    EndIf
 
 Next

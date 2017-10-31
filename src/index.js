@@ -28,6 +28,7 @@ function getIcon(processPath) {
 }
 
 const findWindows = memoize((term) => {
+  console.log("searching for: " + term)
   return shellCommand(LIST_CMD +" " + term).then(result => {
     return JSON.parse(result);
   })
@@ -43,16 +44,16 @@ const findWindows = memoize((term) => {
 const fn = ({term, display}) => {
   // const match = term.match(REGEXP);
   // if (match) {
-    const searchTerm = term;
-    if (!searchTerm || searchTerm.len < 3) {
-      return;
-    }
+    const searchTerm = term.trim();
+    // if (!searchTerm || searchTerm.len < 3) {
+    //   return;
+    // }
     findWindows(searchTerm).then(list => {
-      const results = list.map(({pid,i, hwnd, processPath, title, match}) => ({
+      const results = list.filter(({title})=>(title != "Cerebro")).map(({pid,i, hwnd, processPath, title, match}) => ({
         id: i,
         title,
         icon: processPath,
-        subtitle: match,
+        subtitle: processPath,
         onSelect: () => shellCommand(ACTIVATE_CMD + " " + hwnd).then(r => console.log(r))
       }));
       display(results);
@@ -64,5 +65,6 @@ module.exports = {
   name: 'Open window by name',
   //keyword: 'win',
   //icon: pluginIcon,
+  order: 1,
   fn
 };
