@@ -1,5 +1,9 @@
 #AutoIt3Wrapper_Change2CUI=y
+#include <Debug.au3>
 #include <WinAPI.au3>
+
+;_DebugSetup("WinList autoit", False , 4, EnvGet( "Temp") & "\list-windows.log")
+
 ; #AutoIt3Wrapper_Au3Check_Parameters=-d -w 1 -w 2 -w 3 -w- 4 -w 5 -w 6 -w- 7
 Opt("WinTextMatchMode", 4)
 Local $searchTerm = ""
@@ -33,15 +37,22 @@ For $i = 1 to $v[0][0]
 	  	  ConsoleWrite(",")
    endif
    $eaten = $eaten + 1
-   Local $preJson = "{'pid': " & $pid & ", 'i': " & $i& ", 'hwnd': '" & $hwnd & "', 'processPath': '" & _SanitizeToken($path) & "', 'title':'" & _SanitizeToken($title) &  "', 'match': '"  & _SanitizeToken($title) & "'}"
+   Local $index = $i
+   ;if $eaten == 1  then
+;	  $index = 999
+ ;  EndIf
+   Local $preJson = "{'pid': " & $pid & ", 'i': " & $index & ", 'hwnd': '" & $hwnd & "', 'processPath': '" & _SanitizeToken($path) & "', 'title':'" & _SanitizeToken($title) &  "', 'match': '"  & _SanitizeToken($title) & "'}"
 	  Local $json = StringReplace( StringReplace( $preJson, "'", """"), "\", "\\")
    ConsoleWrite( _WinAPI_WideCharToMultiByte (  $json, 65001,1)	   & @CRLF)
+
+ ; _DebugOut( $json )
 
    if $eaten > 20 then
 	  ExitLoop
    EndIf
 
 Next
+;  _DebugOut( "----------------------------------------" )
 
 
 ConsoleWrite("]" & @CRLF)

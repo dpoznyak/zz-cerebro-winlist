@@ -8,11 +8,6 @@ const ACTIVATE_CMD = 'C:\\_dev\\other\\cerebro\\zz-cerebro-winlist\\autoit\\acti
 
 const DEFAULT_ICON = '/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/ExecutableBinaryIcon.icns';
 
-const MEMOIZE_OPTIONS = {
-  promise: 'then',
-  maxAge: 5 * 1000,
-  preFetch: true
-}
 
 /**
  * Parse line of ps command
@@ -27,13 +22,15 @@ function getIcon(processPath) {
   return processPath
 }
 
-const findWindows = memoize((term) => {
+const findWindows = (term) => {
   console.log("searching for: " + term)
   return shellCommand(LIST_CMD +" " + term).then(result => {
+
+
     return JSON.parse(result);
   })
   
-}, MEMOIZE_OPTIONS);
+};
 
 /**
  * Plugin to look and display local and external IPs
@@ -49,7 +46,12 @@ const fn = ({term, display}) => {
     //   return;
     // }
     findWindows(searchTerm).then(list => {
-      const results = list.filter(({title})=>(title != "Cerebro")).map(({pid,i, hwnd, processPath, title, match}) => ({
+      console.debug(`******************Raw: ${JSON.stringify(list)}`)
+      const filtered = list.filter(({processPath})=>(!processPath.includes("Cerebro")));
+      console.debug(`****************-cerebro: ${JSON.stringify(filtered)}`)
+      const sliced = filtered.slice(1);
+      console.debug(`************-1: ${JSON.stringify(filtered)}`)
+      const results = sliced.map(({pid,i, hwnd, processPath, title, match}) => ({
         id: i,
         title,
         icon: processPath,
