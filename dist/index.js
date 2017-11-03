@@ -970,9 +970,9 @@ const fn = ({ term, display }) => {
   findWindows(searchTerm).then(list => {
     console.debug(`******************Raw: ${JSON.stringify(list)}`);
     const filtered = list.filter(({ processPath }) => !processPath.includes("Cerebro"));
-    console.debug(`****************-cerebro: ${JSON.stringify(filtered)}`);
+    //console.debug(`****************-cerebro: ${JSON.stringify(filtered)}`)
     const sliced = filtered.slice(1);
-    console.debug(`************-1: ${JSON.stringify(filtered)}`);
+    //console.debug(`************-1: ${JSON.stringify(filtered)}`)
     const results = sliced.map(({ pid, i, hwnd, processPath, title, match }) => ({
       id: i,
       title,
