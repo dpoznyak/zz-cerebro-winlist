@@ -33,7 +33,7 @@ For $i = 1 to $v[0][0]
 	  	  ConsoleWrite(",")
    endif
    $eaten = $eaten + 1
-   Local $preJson = "{'pid': " & $pid & ", 'i': " & $i& ", 'hwnd': '" & $hwnd & "', 'processPath': '" & $path & "', 'title':'" & $title &  "', 'match': '"  & $title & "'}"
+   Local $preJson = "{'pid': " & $pid & ", 'i': " & $i& ", 'hwnd': '" & $hwnd & "', 'processPath': '" & _SanitizeToken($path) & "', 'title':'" & _SanitizeToken($title) &  "', 'match': '"  & _SanitizeToken($title) & "'}"
 	  Local $json = StringReplace( StringReplace( $preJson, "'", """"), "\", "\\")
    ConsoleWrite( _WinAPI_WideCharToMultiByte (  $json, 65001,1)	   & @CRLF)
 
@@ -47,6 +47,9 @@ Next
 ConsoleWrite("]" & @CRLF)
 
 
+Func _SanitizeToken($token)
+   return StringReplace(StringReplace($token, """", "`"), "'", "`")
+EndFunc
 
 Func _ProcessGetLocation($iPID)
     Local $aProc = DllCall('kernel32.dll', 'hwnd', 'OpenProcess', 'int', BitOR(0x0400, 0x0010), 'int', 0, 'int', $iPID)
