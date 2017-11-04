@@ -46,12 +46,15 @@ const fn = ({term, display}) => {
     //   return;
     // }
     findWindows(searchTerm).then(list => {
-      console.debug(`******************Raw: ${JSON.stringify(list)}`)
-      const filtered = list.filter(({processPath})=>(!processPath.includes("Cerebro")));
+      //console.debug(`******************Raw: ${JSON.stringify(list)}`);
       //console.debug(`****************-cerebro: ${JSON.stringify(filtered)}`)
-      const sliced = filtered.slice(1);
+      const filtered = list.filter(({processPath})=>(!processPath.includes("Cerebro")));
+      const actualList = 
+        (searchTerm.trim() == "") ?
+        filtered.slice(1) :
+        filtered;
       //console.debug(`************-1: ${JSON.stringify(filtered)}`)
-      const results = sliced.map(({pid,i, hwnd, processPath, title, match}) => ({
+      const results = actualList.map(({pid,i, hwnd, processPath, title, match}) => ({
         id: i,
         title,
         icon: processPath,
