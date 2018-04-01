@@ -1,4 +1,7 @@
+#Region ;**** Directives created by AutoIt3Wrapper_GUI ****
+#AutoIt3Wrapper_UseX64=n
 #AutoIt3Wrapper_Change2CUI=y
+#EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
 #include <Debug.au3>
 #include <WinAPI.au3>
 
@@ -7,7 +10,7 @@
 ; #AutoIt3Wrapper_Au3Check_Parameters=-d -w 1 -w 2 -w 3 -w- 4 -w 5 -w 6 -w- 7
 Opt("WinTextMatchMode", 4)
 Local $searchTerm = ""
-Local $term  = ""
+Local $term  = "."
 if UBound($CmdLine) > 1 Then
 $term= $CmdLine[1]
 EndIf
@@ -29,8 +32,11 @@ For $i = 1 to $v[0][0]
    Local $title = $v[$i][0]
    Local $path = _ProcessGetLocation($pid)
    Local $exStyle = _WinAPI_GetWindowLong ($hwnd, $GWL_EXSTYLE)
-   if ($title == "") or ($path == "") or (BitAND($exStyle,0x00000080 ) <> 0) or BitAND(WinGetState($hwnd), 2) ==0 Then ;$WS_EX_APPWINDOW
-	  ContinueLoop
+   Local $wsExAppWindow = BitAND(WinGetState($hwnd), 2)
+   Local $excluded = 0
+   if ($title == "") or ($path == "") or (BitAND($exStyle,0x00000080 ) <> 0) or $wsExAppWindow ==0 Then ;$WS_EX_APPWINDOW    
+    $excluded = 1
+    ContinueLoop  
    EndIf
 
    if $eaten > 0 Then
@@ -41,7 +47,7 @@ For $i = 1 to $v[0][0]
    ;if $eaten == 1  then
 ;	  $index = 999
  ;  EndIf
-   Local $preJson = "{'pid': " & $pid & ", 'i': " & $index & ", 'hwnd': '" & $hwnd & "', 'processPath': '" & _SanitizeToken($path) & "', 'title':'" & _SanitizeToken($title) &  "', 'match': '"  & _SanitizeToken($title) & "'}"
+   Local $preJson = "{'pid': " & $pid & ", 'i': " & $index & ", 'hwnd': '" & $hwnd & "', 'processPath': '" & _SanitizeToken($path) & "', 'title':'" & _SanitizeToken($title) &  "', 'match': '"  & _SanitizeToken($title) & "', 'exstyle': " & $exStyle & ",'wsExAppWindow': " & $wsExAppWindow & ",'excluded': " & $excluded & "}"
 	  Local $json = StringReplace( StringReplace( $preJson, "'", """"), "\", "\\")
    ConsoleWrite( _WinAPI_WideCharToMultiByte (  $json, 65001,1)	   & @CRLF)
 
